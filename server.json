@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.applystead/jobs",
+  "title": "Applystead",
+  "description": "Search open jobs from employers' own career sites: roles, companies and posting status.",
+  "websiteUrl": "https://applystead.com/developers",
+  "repository": {
+    "url": "https://github.com/usr-bin-roygbiv/applystead-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://applystead.com/mcp"
+    }
+  ]
+}
