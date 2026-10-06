@@ -3,12 +3,12 @@
   "name": "com.applystead/jobs",
   "title": "Applystead",
   "description": "Search open jobs from employers' own career sites: roles, companies and posting status.",
+  "version": "1.0.0",
   "websiteUrl": "https://applystead.com/developers",
   "repository": {
     "url": "https://github.com/usr-bin-roygbiv/applystead-mcp",
     "source": "github"
   },
-  "version": "1.0.0",
   "remotes": [
     {
       "type": "streamable-http",
