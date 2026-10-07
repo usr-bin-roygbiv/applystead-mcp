@@ -45,7 +45,7 @@ curl -s https://applystead.com/mcp -H 'content-type: application/json' \
 
 ## Tools
 
-All tools are read-only and idempotent. Every job links its Applystead job page and the employer's own posting.
+All tools are read-only and idempotent. Every job opens on its Applystead job page, with Apply with Applystead.
 
 | Tool | Arguments | Returns |
 | --- | --- | --- |
