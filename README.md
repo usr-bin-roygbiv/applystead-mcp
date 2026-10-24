@@ -2,26 +2,48 @@
 
 Search open jobs from employers' own career sites, straight from ChatGPT, Claude or any MCP client.
 
-Applystead's MCP server is a **remote, read-only** [Model Context Protocol](https://modelcontextprotocol.io) server. It searches the open roles Applystead publishes from employers' own applicant tracking systems (Greenhouse, Lever, Ashby, Workday and more), lists a company's open jobs, and checks whether a job posting is still open. No install, no API key, no sign-in.
+Applystead's MCP server is a remote [Model Context Protocol](https://modelcontextprotocol.io) server. Its three job search tools are read-only and open to anyone: they search the open roles Applystead publishes from employers' own career sites, list a company's open jobs, and check whether a job posting is still open. Searching needs no install, no API key and no sign-in. Applystead members can also sign in to use their own account from an AI agent; see the docs.
 
 - **Server URL:** `https://applystead.com/mcp`
-- **Transport:** Streamable HTTP (stateless JSON responses)
-- **Authentication:** none (the data is public)
+- **Transport:** Streamable HTTP (one JSON-RPC 2.0 message per POST, one JSON response back)
+- **Authentication:** none for job search (up to 60 requests a minute from one address); account tools ask you to sign in (OAuth)
 - **Docs:** https://applystead.com/developers
 
 ## Add it
 
 ### Claude (custom connector)
 
-1. In Claude, open **Settings → Connectors** and choose **Add custom connector**.
-2. Name it `Applystead` and enter `https://applystead.com/mcp` as the remote MCP server URL. Leave OAuth empty.
-3. Enable the connector in a chat and ask a job question.
+1. In Claude, open **Customize → Connectors**, choose **+ Add**, then **Add custom connector**.
+2. Name it `Applystead`, paste `https://applystead.com/mcp` and choose **Continue**, then **Continue** again.
+3. Under **Authentication** choose **Sign in when needed**, keep **Use Claude's published identity** as the OAuth client, then **Add**. Job search works without signing in.
 
-### ChatGPT (developer mode)
+### ChatGPT
 
-1. In ChatGPT, open **Settings → Apps & Connectors → Advanced settings** and turn on **Developer mode**.
-2. Under **Apps & Connectors**, choose **Create**, name it `Applystead` and enter `https://applystead.com/mcp` as the MCP server URL, with no authentication.
-3. Select the app in a chat. Results render in an interactive job list.
+1. In ChatGPT, open **Plugins**, choose the plus button, then **Add custom MCP server**.
+2. Enter `Applystead` and `https://applystead.com/mcp`, set the authentication to **OAuth**, confirm the warning and choose **Create as a plugin**.
+3. Adding your own MCP server depends on your ChatGPT plan and workspace settings.
+
+### Claude Code
+
+```sh
+claude mcp add --transport http --scope user applystead https://applystead.com/mcp
+claude mcp login applystead   # only for account tools; job search needs no sign-in
+```
+
+### Codex
+
+```sh
+codex mcp add applystead --url https://applystead.com/mcp
+codex mcp login applystead   # only for account tools; job search needs no sign-in
+```
+
+### Gemini CLI
+
+```sh
+gemini mcp add --transport http applystead https://applystead.com/mcp
+```
+
+For account tools, run `/mcp auth applystead` inside Gemini CLI; job search needs no sign-in.
 
 ### Other MCP clients
 
@@ -39,35 +61,36 @@ Try it with curl:
 
 ```sh
 curl -s https://applystead.com/mcp -H 'content-type: application/json' \
-  -H 'accept: application/json, text/event-stream' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_jobs","arguments":{"query":"data engineer","limit":3}}}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_jobs","arguments":{"query":"data engineer","remote_country":"US","limit":5}}}'
 ```
 
-## Tools
+## Job search tools
 
-All tools are read-only and idempotent. Every job opens on its Applystead job page, with Apply with Applystead.
+Read-only and open to anyone. Every job opens on its Applystead job page, with Apply with Applystead.
 
 | Tool | Arguments | Returns |
 | --- | --- | --- |
-| `search_jobs` | `query?` (up to 120 chars), `remote_country?` (ISO 2-letter code), `company?` (name or slug), `kind?` (`internship` or `new-grad`), `pay_listed?` (boolean), `posted_within_hours?` (1–720), `limit?` (1–20, default 10) | Matching open jobs, newest first |
-| `get_company_jobs` | `company` (name or slug) | The company (name, ATS, open roles, company page) and its 10 newest jobs |
-| `check_job_posting` | `url` (https job posting URL) | Whether the posting is `open`, `closed`, `unknown` or `unsupported` |
+| `search_jobs` | `query?`, `remote_country?` (2-letter country code), `company?` (name or slug), `kind?` (`internship` or `new-grad`), `pay_listed?`, `posted_within_hours?` (1-720), `limit?` (1-20, default 10) | Matching open jobs, newest first |
+| `get_company_jobs` | `company` (name or slug) | The company's name, open roles and company page, and its 10 newest jobs |
+| `check_job_posting` | `url` (https job posting URL) | Whether the posting is `open`, `closed`, `unknown` or `unsupported`; the URL is never fetched |
+
+The other tools act on a signed-in member's own account; https://applystead.com/developers lists them.
 
 ## Example prompts
 
 - "Find remote data engineer jobs in the US posted in the last 3 days."
 - "Which 2027 software engineering internships list pay?"
 - "What jobs is Stripe hiring for right now?"
-- "Is this job posting still open? https://boards.greenhouse.io/..."
-- "Show new-grad backend roles at companies using Ashby."
+- "Is this job posting still open? <paste the posting URL>"
+- "Show new-grad backend roles posted this week."
 
 ## Privacy
 
-Requests are not stored and tool arguments are not logged. Answers contain only what Applystead's public job and company pages already show; no personal data is requested. Privacy policy: https://applystead.com/privacy
+Job search requests are not stored, and the words, names and links in them are not logged. Privacy policy: https://applystead.com/privacy
 
 ## Support
 
-Email support@mail.applystead.com.
+Email hello@applystead.com.
 
 ## License
 
